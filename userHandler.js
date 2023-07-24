@@ -63,10 +63,27 @@ const uptdateUser = (req, res) => {
       res.status(500).send("Error editing the movie");
     });
 };
+const deleteUser = (req, res) => {
+  const id = parseInt(req.params.id);
+  database
+    .query("DELETE FROM users where id= ?", [id])
+    .then(([result]) => {
+      if (result.affectedRows === 0) {
+        res.statut(404).send("Not found");
+      } else {
+        res.sendStatus(204);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error deleting the movie");
+    });
+};
 
 module.exports = {
   getUsers,
   getUsersById,
   postUsers,
   uptdateUser,
+  deleteUser,
 };
