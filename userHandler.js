@@ -1,8 +1,56 @@
 const database = require("./database");
 
 const getUsers = (req, res) => {
+  //methode 1
+  // let sql = "SELECT * FROM users";
+  // const sqlValue = [];
+  // if (req.query.city != null) {
+  //   sql += " where city = ?";
+  //   sqlValue.push(req.query.city);
+
+  //   if (req.query.language != null) {
+  //     sql += " and  language = ? ";
+  //     sqlValue.push(req.query.language);
+  //   }
+  // } else if (req.query.language != null) {
+  //   sql += " where language = ? ";
+  //   sqlValue.push(req.query.language);
+  // }
+  // database
+  //   .query(sql, sqlValue)
+  //   .then(([users]) => {
+  //     res.json(users);
+  //   })
+  //   .catch((err) => {
+  //     console.error(err);
+  //     res.status(500).send("Error retrieving data from database");
+  //   });
+  //methonde 2
+  const initialSql = "SELECT * FROM users";
+  const where = [];
+  if (req.query.city != null) {
+    where.push({
+      column: "city",
+      value: req.query.city,
+      operator: "=",
+    });
+  }
+  if (req.query.language != null) {
+    where.push({
+      column: "language",
+      value: req.query.language,
+      operator: "=",
+    });
+  }
   database
-    .query("select * from users")
+    .query(
+      where.reduce(
+        (sql, { column, operator }, index) =>
+          `${sql}${index === 0 ? " where " : " and "}${column} ${operator} ?`,
+        initialSql
+      ),
+      where.map(({ value }) => value)
+    )
     .then(([users]) => {
       res.json(users);
     })
