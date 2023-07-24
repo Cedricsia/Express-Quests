@@ -1,35 +1,41 @@
 const database = require("./database");
 
-const getUsers = (req, res) => {
-  database
-    .query("select * from users")
-    .then(([users]) => {
-      res.json(users);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send("Error retrieving data from database");
-    });
+const getMovies = (req, res) => {
+  database.query("SELECT * FROM movies").then(([result]) => {
+    res.status(200).json(result);
+  });
 };
 
-const getUsersById = (req, res) => {
+const getMovieById = (req, res) => {
   const id = parseInt(req.params.id);
+
+  const movie = movies.find((movie) => movie.id === id);
+
+  if (movie != null) {
+    res.json(movie);
+  } else {
+    res.status(404).send("Not Found");
+  }
+};
+
+const postMovie = (req, res) => {
+  const { title, director, year, color, duration } = req.body;
   database
-    .query("select * from users where id = ?", [id])
-    .then(([users]) => {
-      if (users[0] != null) {
-        res.json(users[0]);
-      } else {
-        res.status(404).send("Not Found");
-      }
+    .query(
+      "INSERT INTO movies(title, director, year, color, duration) VALUES (?, ?, ?, ?, ?)",
+      [title, director, year, color, duration]
+    )
+    .then(([result]) => {
+      res.location(`/api/movies/${result.insertId}`).sendStatus(201);
     })
     .catch((err) => {
       console.error(err);
-      res.status(500).send("Error retrieving data from database");
+      res.status(500).send("Error saving the movie");
     });
 };
 
 module.exports = {
-  getUsers,
-  getUsersById,
+  getMovies,
+  getMovieById,
+  postMovie,
 };

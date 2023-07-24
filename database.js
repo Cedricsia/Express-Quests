@@ -1,5 +1,6 @@
 require("dotenv").config();
 const mysql = require("mysql2/promise");
+
 const database = mysql.createPool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
@@ -12,15 +13,6 @@ database
   .getConnection()
   .then(() => {
     console.log("Can reach database");
-  })
-  .catch((err) => {
-    console.error(err);
-  });
-
-database
-  .query("select * from users")
-  .then(([users]) => {
-    console.log(users);
   })
   .catch((err) => {
     console.error(err);
